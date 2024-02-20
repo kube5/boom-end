@@ -44,11 +44,11 @@ contract Staking is ReentrancyGuard{
         require(token == address(usdt) || token == address(usdc), "Invalid token");
         uint8 decimals = getDecimals(token);
         if (token == address(usdt)) {
-            require(IERC20(token).balanceOf(msg.sender) >= 10**decimals, "Insufficient balance");
-            usdt.transferFrom(msg.sender, address(this), 10**decimals);
+            require(IERC20(token).balanceOf(msg.sender) >= 10**decimals * 10, "Insufficient balance");
+            usdt.transferFrom(msg.sender, address(this), 10**decimals * 10);
         } else {
-            require(IERC20(token).balanceOf(msg.sender) >= 10**decimals, "Insufficient balance");
-            usdc.transferFrom(msg.sender, address(this), 10**decimals);
+            require(IERC20(token).balanceOf(msg.sender) >= 10**decimals * 10, "Insufficient balance");
+            usdc.transferFrom(msg.sender, address(this), 10**decimals * 10);
         }
         staker.isMintDice = true;
         emit MintDice(msg.sender, token);
@@ -66,7 +66,6 @@ contract Staking is ReentrancyGuard{
         emit StakeEth(msg.sender, amount);
     }
 
-    // 质押 USDT
     function stakeUsdt(uint256 amount) external nonReentrant{
         require(amount > 0, "Invalid amount");
         require(usdt.balanceOf(msg.sender) >= amount, "Insufficient balance");

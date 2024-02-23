@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/Mu-Exchange/Mu-End/common"
 	"github.com/Mu-Exchange/Mu-End/common/config"
@@ -20,7 +19,6 @@ import (
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/logger"
 	"go-micro.dev/v4/registry"
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 var (
@@ -48,14 +46,6 @@ func start(ctx *cli.Context) error {
 	log := repo.SetupLogger(repoRoot, cfg.Log, repo2.ModuleName)
 	components := repo.Init(context.Background(), cfg, log)
 
-	fmt.Print("please input admin private key:")
-	input, err := terminal.ReadPassword(int(os.Stdin.Fd()))
-	if err != nil {
-		fmt.Println("load key err:", err)
-		return err
-	}
-	fmt.Printf("\nthe private key [%s******%s] was successfully loaded!\n", string(input[:5]), string(input[len(input)-5:]))
-	components.Cfg.Keys.Admin = string(input)
 	return run(components)
 }
 

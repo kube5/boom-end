@@ -1,0 +1,12 @@
+go 1.20
+
+use (
+	./api
+	./common
+	./user
+	./game
+)
+
+// mysql -h boom-test-1.cx020wscaopo.ap-northeast-1.rds.amazonaws.com -P 3306 -u admin -p
+   //sgXTxiy2l7rPTXeLwK8U
+

@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+package proto;
+import "proto/base.proto";
+option go_package = "./proto;proto";
+
+service User{
+  rpc Call(Empty) returns (proto.Empty);
+  rpc LoginPreByMetaMask(LoginPreByMetaMaskReq) returns (LoginPreByMetaMaskResp);
+  rpc LoginByMetaMask(LoginByMetaMaskReq) returns (LoginByMetaMaskResp);
+  rpc RefreshToken(RefreshTokenReq) returns (RefreshTokenResp);
+  rpc Logout(LogoutReq) returns (proto.Empty);
+  rpc Profile(UserMutualReq) returns (ProfileResp);
+  rpc UpdateUser(UpdateUserReq) returns (proto.Empty);
+
+  rpc FindUserIdByWallet(Wallet) returns (UserIdResp);
+
+  //--------------internal-------------------
+  rpc LoginInternal(LoginInternalReq) returns (LoginByMetaMaskResp);
+}
+
+
+message LoginInternalReq {
+  string address = 1;
+}
+
+message UpdateUserReq {
+  string wallet = 1;
+  string eth_stake_amount = 2;
+  string usdb_stake_amount = 3;
+  int64 dice = 4;
+  bool mint_dice = 5;
+}
+
+message LogoutReq {
+  string access_uuid = 1;
+  string user_id = 2;
+}
+
+
+message RefreshTokenReq {
+  string refresh_uuid = 1;
+  string user_id = 2;
+  string access_uuid = 3;
+}
+
+message RefreshTokenResp {
+  string access_token = 1;
+  string refresh_token = 2;
+  int64 at_expires = 3;
+  int64 rt_expires = 4;
+}
+
+message LoginByMetaMaskReq {
+  string public_address = 1;
+  string signature = 2;
+  string email_code = 3;
+}
+
+message LoginByMetaMaskResp {
+  string access_token = 1;
+  string refresh_token = 2;
+  int64 at_expires = 3;
+  int64 rt_expires = 4;
+}
+
+message LoginPreByMetaMaskReq {
+  string public_address = 1;
+}
+
+
+message LoginPreByMetaMaskResp {
+  string nonce = 1;
+}
+
+
+message BasicUserInfo {
+  string username = 1;
+  string wallet = 2;
+  string user_id = 3;
+  string profile_url = 4;
+
+  string staking_amount_eth = 5;
+  string staking_amount_usdb = 6;
+  bool mint_dice = 7;
+  uint64 dice_speed = 8;
+}
+
+message UserMutualReq {
+  string id = 1;
+  string target_user_id = 2;
+  string wallet = 3;
+}
+
+message ProfileResp {
+  string id = 1;
+  BasicUserInfo user_info = 2;
+}
+
+message ProfileRelationResp {
+  string id = 1;
+  string grand_user_id = 2;
+  string father_user_id = 3;
+  string grand_wallet = 4;
+  string father_wallet = 5;
+  string wallet = 6;
+  string invited_code = 7;
+}
+
+message UserIdResp {
+  string user_id = 1;
+}
+
+message Wallet {
+  string address = 1;
+}

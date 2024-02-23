@@ -1,0 +1,16 @@
+.idea/
+.vscode/
+.DS_Store
+**/*.so
+*.log
+*.account
+*nohup
+*logs
+node_modules/
+artifacts/
+package-lock.json
+.deps/
+cover.out
+bin/
+repo/repo-packr.go
+repo/packrd

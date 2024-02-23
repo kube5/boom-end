@@ -1,0 +1,125 @@
+syntax = "proto3";
+
+package proto;
+import "proto/base.proto";
+option go_package = "./proto;proto";
+
+service Game {
+  rpc GameRandom(GameRandomReq) returns (GameRandomResp);
+  rpc GameGetInviteCode(UserIdReq) returns (GameGetInviteCodeResp);
+  rpc LeaderBoard(LeaderBoardReq) returns (LeaderBoardResp);
+  rpc MissionCheckIn(UserIdReq) returns (proto.Empty);
+  rpc MissionTweet(MissionTweetReq) returns (proto.Empty);
+  rpc MissionInvited(MissionInvitedReq) returns (proto.Empty);
+  rpc MissionProfile(UserIdReq) returns (MissionProfileResp);
+  rpc ScoreList(ScoreListReq) returns (ScoreListResp);
+  rpc ConsumeList(ConsumeListReq) returns (ConsumeListResp);
+}
+
+
+message MissionInvitedReq {
+  string father_user_id = 1;
+  string twitter = 2;
+}
+
+message MissionTweetReq {
+  string id = 1;
+  string tweet_id = 2;
+}
+
+message ScoreListReq {
+  string user_id = 1;
+  int64 page_no = 2;
+  int64 page_size = 3;
+  uint64 score_type = 4;
+}
+
+message ConsumeListReq {
+  string user_id = 1;
+  int64 page_no = 2;
+  int64 page_size = 3;
+  uint64 consume_type = 4;
+}
+
+
+message ScoreDetail {
+  string id = 1;
+  int64 score = 2;
+  string desc = 3;
+  int64 create_time = 4;
+}
+
+message ScoreListResp {
+  uint64 current_score = 1;
+  uint64 score_accuracy = 2;
+  repeated ScoreDetail score = 3;
+}
+
+message ConsumeListResp {
+  uint64 current_consume = 1;
+  uint64 score_accuracy = 2;
+  repeated ScoreDetail score = 3;
+}
+
+
+message MissionProfileResp {
+  string id = 1;
+  uint64 score = 2;
+  uint64 score_accuracy = 3;
+  repeated Mission mission= 4;
+  uint64 score_used = 5;
+//  repeated Consume consume = 6;
+  uint64 cash = 7;
+}
+
+message Consume {
+  string name = 1;
+  string desc = 2;
+  string desc_id = 3;
+  uint64 score_accuracy = 4;
+  uint64 score_type = 5;
+  uint64 score_amount = 6;
+  repeated ScoreDetail score_history = 8;
+}
+
+message Mission {
+  string name = 1;
+  string desc = 2;
+  uint64 score_accuracy = 3;
+  uint64 score_type = 4;
+  uint64 score_amount = 5;
+  bool daily = 6;
+  bool undo = 7;
+  uint64 mission_score = 8;
+}
+
+message GameGetInviteCodeResp {
+  string code = 1;
+}
+
+message GameRandomReq {
+  string user_id = 1;
+  uint64 level = 2;
+}
+
+message GameRandomResp {
+  uint64 dice1 = 1;
+  uint64 dice2 = 2;
+  uint64 cash = 3;
+}
+
+message LeaderBoardReq {
+  uint64 limit = 1;
+}
+
+message LeaderBoardResp {
+  message LeaderBoardItem {
+    string twitter = 1;
+    string user_id = 2;
+    string father_twitter = 3;
+    uint64 cash = 4;
+    string profile_url = 5;
+  }
+  repeated LeaderBoardItem items = 1;
+}
+

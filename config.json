@@ -1,0 +1,79 @@
+{
+  "consul": {
+    "addrs": ["127.0.0.1:8500"]
+  },
+  "blockchains": [
+    {
+      "chain_id": 534351,
+      "rpc_urls": [
+        "https://rpc.ankr.com/scroll_sepolia_testnet",
+        "https://scroll-sepolia.blockpi.network/v1/rpc/public",
+        "https://scroll-sepolia.chainstacklabs.com"
+      ],
+      "wss_urls" : [
+        "wss://scroll-sepolia.blockpi.network/v1/ws/cbf79cf41780d8bc71d70ea7d98d97cebd01a6c0"
+      ],
+      "filter_step": 1024,
+      "multicall": "0xcA11bde05977b3631167028862bE2a173976CA11",
+      "priv_rpc_url": "https://scroll-sepolia.blockpi.network/v1/rpc/public",
+      "confirm_block": 1,
+      "filter_interval": "6s",
+      "daily_blocks": 17280
+    }
+  ],
+  "mysql": {
+    "max_open_conns": 2000,
+    "max_idle_conns": 200,
+    "conn_max_lifetime": "10m",
+    "enable_slave": false,
+    "master": {
+      "user": "admin",
+      "password": "sgXTxiy2l7rPTXeLwK8U",
+      "ip": "boom-test-1.cx020wscaopo.ap-northeast-1.rds.amazonaws.com",
+      "port": 3306,
+      "db_name": "boom"
+    },
+    "slave": {
+      "user": "root",
+      "password": "",
+      "ip": "127.0.0.1",
+      "port": 3371,
+      "db_name": "mu"
+    }
+  },
+  "redis": {
+    "tls": true,
+    "enable": true,
+    "password": "",
+    "addr": "boom-test-1-ypbfci.serverless.apne1.cache.amazonaws.com:6379",
+    "expired_time": "600s"
+  },
+  "log": {
+    "level": "debug",
+    "max_age": "168h",
+    "rotation_time": "8h"
+  },
+  "tracer": {
+    "enable": false,
+    "jaedger_addr": ""
+  },
+  "http": {
+    "port": 8080,
+    "multipart_memory": "1gb",
+    "read_timeout": "10s",
+    "write_timeout": "10s",
+    "tls_enable": false,
+    "tls_cert_file_path": "",
+    "tls_key_file_path": "",
+    "rps": 10000
+  },
+  "contracts": [
+    {
+      "_comment": "Staking",
+      "chain_id": 534351,
+      "address": "0x76b5a255027A11434C60fE42B464fe5Ed026C3Ce",
+      "start_block": 2894976,
+      "contract_type": 0
+    }
+  ]
+}

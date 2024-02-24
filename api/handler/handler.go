@@ -11,8 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.uber.org/fx"
 
 	derrors "github.com/Mu-Exchange/Mu-End/common/errors"
@@ -146,7 +144,6 @@ func (s *Server) init() error {
 	{
 		i.GET("/wallet_login", s.apiHandlerWrap(s.LoginInternal))
 	}
-	v.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// debug enable pprof
 	if gin.IsDebugging() {

@@ -181,8 +181,18 @@ func (a *Account) LoginInternal(ctx context.Context, publicAddress string) (*mod
 	if err != nil {
 		return nil, err
 	}
+	//if user == nil {
+	//	return nil, derrors.ErrUserNotExist
+	//}
 	if user == nil {
-		return nil, derrors.ErrUserNotExist
+		user = &dto.User{
+			UUID:   uuid.GenUUID().Encode(),
+			Wallet: publicAddress,
+		}
+		if err := a.userDao.Create(user); err != nil {
+			return nil, err
+		}
+		a.Logger.Infof("New user[%s] with address[%s] is registering", user.UUID, user.Wallet)
 	}
 	td, err := utils.CreateToken(user.UUID)
 	if err != nil {

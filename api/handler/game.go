@@ -26,7 +26,12 @@ func (s *Server) GameGetCode(ctx *context.Context, c *gin.Context) (res interfac
 }
 
 func (s *Server) LeaderBoard(ctx *context.Context, c *gin.Context) (res interface{}, err error) {
-	return s.gameService.LeaderBoard(ctx.Ctx(), &pb.LeaderBoardReq{Limit: 20})
+	token, err := s.ExtractTokenMetadata(c)
+	userId := ""
+	if err == nil {
+		userId = token.UserId
+	}
+	return s.gameService.LeaderBoard(ctx.Ctx(), &pb.LeaderBoardReq{UserId: userId, Limit: 20})
 }
 
 func (s *Server) ScoreList(ctx *context.Context, c *gin.Context) (res interface{}, err error) {

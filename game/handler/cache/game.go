@@ -48,8 +48,9 @@ type GameCache interface {
 	TopIndexLB(pageNo, pageSize int64) (int64, []string, error)
 	SetLeaderBoardUser(userId string, score uint64) error
 	GetLeaderBoardUser(userId string) (uint64, error)
+	GetLeaderBoardUserScore(userId string) (uint64, error)
 
-	SetUserStake(userId string) error
+	SetUserStake(wallet string) error
 	GetUserStake() ([]string, error)
 }
 
@@ -187,8 +188,19 @@ func (u *Game) GetLeaderBoardUser(userId string) (uint64, error) {
 	return val, err
 }
 
-func (u *Game) SetUserStake(userId string) error {
-	if err := u.ZAdd(ctx, userStakes(), redis_client.Z{Member: userId, Score: float64(0)}).Err(); err != nil {
+func (u *Game) GetLeaderBoardUserScore(userId string) (uint64, error) {
+	val, err := u.ZRank(ctx, topIndexLB(), userId).Uint64()
+	if err == redis_client.Nil {
+		return 0, nil
+	}
+	if err != nil {
+		return 0, err
+	}
+	return val, err
+}
+
+func (u *Game) SetUserStake(wallet string) error {
+	if err := u.ZAdd(ctx, userStakes(), redis_client.Z{Member: wallet, Score: float64(0)}).Err(); err != nil {
 		return err
 	}
 	return nil

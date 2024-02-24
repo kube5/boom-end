@@ -101,6 +101,16 @@ func (s *Server) Logout(ctx *context.Context, c *gin.Context) (res interface{}, 
 	return s.userService.Logout(ctx.Ctx(), &pb.LogoutReq{UserId: token.UserId, AccessUuid: token.AccessUuid})
 }
 
+// Profile godoc
+//
+//	@Summary		Profile
+//	@Tags			example
+//	@Accept			query
+//	@Produce		plain
+//	@Success		200	{string}	string	"pong"
+//	@Failure		400	{string}	string	"ok"
+//	@Failure		404	{string}	string	"ok"
+//	@Failure		500	{string}	string	"ok"
 func (s *Server) Profile(ctx *context.Context, c *gin.Context) (res interface{}, err error) {
 	req := &model.UserIdReq{}
 	if err := c.ShouldBindQuery(req); err != nil {

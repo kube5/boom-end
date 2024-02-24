@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Mu-Exchange/Mu-End/common/proto"
+	"github.com/Mu-Exchange/Mu-End/game/handler/cache"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/sirupsen/logrus"
@@ -34,7 +35,7 @@ type Staking struct {
 	staking         *contract2.StakingWrapper
 	contractDao     dao.GameContractDao
 	recordDao       dao.GameMonitorRecordDao
-	gs              GameService
+	gCache          cache.GameCache
 	blockchain      *config.Blockchain
 	contractConfig  *config.ContractConfig
 	contractToProjM map[string]string
@@ -48,7 +49,7 @@ func NewStakingService(
 	cfg repo.CommonComponents,
 	userService proto.UserService,
 	service BaseService,
-	gs GameService,
+	gCache cache.GameCache,
 	contractDao dao.GameContractDao,
 	recordDao dao.GameMonitorRecordDao,
 ) (StakingService, error) {
@@ -63,8 +64,8 @@ func NewStakingService(
 		staking:          StakingWrapper,
 		CommonComponents: cfg,
 		userService:      userService,
-		gs:               gs,
 		recordDao:        recordDao,
+		gCache:           gCache,
 		contractDao:      contractDao,
 		blockchain:       cfg.Cfg.Blockchains[0],
 		contractToProjM:  make(map[string]string),
@@ -266,6 +267,12 @@ func (f *Staking) handleStakeSnapshotEvent(event *staking.StakingStakeSnapshot) 
 	})
 	if err != nil {
 		f.Logger.Errorf("handleStakeSnapshotEventErr:%v", err)
+		return nil
+	}
+	err = f.gCache.SetUserStake(event.Staker.Hex())
+	if err != nil {
+		f.Logger.Errorf("handleStakeSnapshotEventErr:%v", err)
+		return nil
 	}
 	record := genRecordByEvent(f.staking.ChainId(), &event.Raw)
 	if err := f.recordDao.Create(record); err != nil {

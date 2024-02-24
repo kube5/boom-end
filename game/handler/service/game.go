@@ -25,7 +25,7 @@ type GameService interface {
 	DoMission(ctx context.Context, userId, address string, score int64) error
 	Cron(ctx context.Context) error
 	GameRandom(ctx context.Context, userId string, level int) (int, int, int, error)
-	LeaderBoard(ctx context.Context, limit uint64) ([]*proto.LeaderBoardResp_LeaderBoardItem, error)
+	LeaderBoard(ctx context.Context, userId string, limit uint64) ([]*proto.LeaderBoardResp_LeaderBoardItem, *proto.LeaderBoardResp_LeaderBoardItem, error)
 	CheckDailyMission(ctx context.Context, userId string, missionType uint64) (bool, error)
 
 	AddScoreHistory(history *dto.UserScoreHistory) error
@@ -98,37 +98,24 @@ func (a *Game) Cron(ctx context.Context) error {
 		return err
 	}
 	a.Logger.Infof("start to send dice for users length:[%d]", len(userStakes))
-	for _, userId := range userStakes {
+	for _, wallet := range userStakes {
 		user, err := a.userService.Profile(ctx, &proto.UserMutualReq{
-			TargetUserId: userId,
+			Wallet: wallet,
 		})
 		if err != nil {
 			return err
 		}
-		if err := a.DoMission(ctx, userId, "", int64(user.UserInfo.DiceSpeed)); err != nil {
-			a.Logger.Errorf("do mission for user [%s] err [%s]", userId, err.Error())
+		if err := a.DoMission(ctx, user.Id, wallet, int64(user.UserInfo.DiceSpeed)); err != nil {
+			a.Logger.Errorf("do mission for user [%s] err [%s]", wallet, err.Error())
 		}
 	}
 	return nil
 }
 
 func (a *Game) DoMission(ctx context.Context, userId, address string, score int64) error {
-	if len(userId) == 0 {
-		if len(address) == 0 {
-			a.Logger.Warnf("cannot found address [%s] user", address)
-			return nil
-		}
-		user, err := a.userService.Profile(ctx, &proto.UserMutualReq{
-			Wallet: address,
-		})
-		if err != nil {
-			return err
-		}
-		if nil == user {
-			a.Logger.Warnf("cannot found address [%s] user ", address)
-			return nil
-		}
-		userId = user.Id
+	if len(address) == 0 || len(userId) == 0 {
+		a.Logger.Warnf("cannot found address [%s] user", address)
+		return nil
 	}
 
 	if err := a.AddScoreHistory(&dto.UserScoreHistory{
@@ -282,13 +269,13 @@ func (ref *Game) GameRandom(ctx context.Context, userId string, level int) (int,
 	return dice1, dice2, cash, nil
 }
 
-func (ref *Game) LeaderBoard(ctx context.Context, limit uint64) ([]*proto.LeaderBoardResp_LeaderBoardItem, error) {
+func (ref *Game) LeaderBoard(ctx context.Context, userId string, limit uint64) ([]*proto.LeaderBoardResp_LeaderBoardItem, *proto.LeaderBoardResp_LeaderBoardItem, error) {
 	if limit == 0 {
 		limit = 10
 	}
 	_, userIds, err := ref.gameCache.TopIndexLB(1, int64(limit))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	var items []*proto.LeaderBoardResp_LeaderBoardItem
 	for _, userId := range userIds {
@@ -296,19 +283,43 @@ func (ref *Game) LeaderBoard(ctx context.Context, limit uint64) ([]*proto.Leader
 			TargetUserId: userId,
 		})
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		cash, err := ref.gameCache.GetLeaderBoardUser(user.Id)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		items = append(items, &proto.LeaderBoardResp_LeaderBoardItem{
-			UserId:     user.Id,
-			Cash:       cash,
-			ProfileUrl: user.UserInfo.ProfileUrl,
+			Wallet: user.UserInfo.Wallet,
+			Cash:   cash,
 		})
 	}
-	return items, nil
+	if len(userId) > 0 {
+		user, err := ref.userService.Profile(ctx, &proto.UserMutualReq{
+			TargetUserId: userId,
+		})
+		if err != nil {
+			return nil, nil, err
+		}
+		rank, err := ref.gameCache.GetLeaderBoardUserScore(user.Id)
+		if err != nil {
+			return nil, nil, err
+		}
+		if 0 == rank {
+			return items, nil, nil
+		}
+		cash, err := ref.gameCache.GetLeaderBoardUser(user.Id)
+		if err != nil {
+			return nil, nil, err
+		}
+		return items, &proto.LeaderBoardResp_LeaderBoardItem{
+			Wallet: user.UserInfo.Wallet,
+			Cash:   cash,
+			Rank:   rank,
+		}, nil
+	} else {
+		return items, nil, nil
+	}
 }
 
 func NewGameService(lc fx.Lifecycle, sd fx.Shutdowner, cfg repo.CommonComponents,

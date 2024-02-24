@@ -174,11 +174,12 @@ func NewGame(c repo.CommonComponents,
 }
 
 func (w *Game) LeaderBoard(ctx context.Context, req *proto.LeaderBoardReq, resp *proto.LeaderBoardResp) error {
-	board, err := w.gs.LeaderBoard(ctx, req.Limit)
+	items, self, err := w.gs.LeaderBoard(ctx, req.UserId, req.Limit)
 	if err != nil {
 		return err
 	}
-	resp.Items = board
+	resp.Items = items
+	resp.Self = self
 	return nil
 }
 

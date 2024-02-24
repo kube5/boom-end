@@ -109,17 +109,17 @@ message GameRandomResp {
 }
 
 message LeaderBoardReq {
-  uint64 limit = 1;
+  string userId = 1;
+  uint64 limit = 2;
 }
 
 message LeaderBoardResp {
   message LeaderBoardItem {
-    string twitter = 1;
-    string user_id = 2;
-    string father_twitter = 3;
-    uint64 cash = 4;
-    string profile_url = 5;
+    string wallet = 1;
+    uint64 cash = 2;
+    uint64 rank = 3;
   }
   repeated LeaderBoardItem items = 1;
+  LeaderBoardItem self = 2;
 }
 

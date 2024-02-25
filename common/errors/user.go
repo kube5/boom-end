@@ -74,7 +74,7 @@ var (
 	ErrTweetNotBelongUser    = errors.New("error tweet not belong you")
 	ErrWrongScoreHistoryId   = errors.New("error wrong score history id")
 	ErrUserPostTooFrequently = errors.New("post comment or reply too frequently")
-	ErrNotEnoughScore        = errors.New("not enough score")
+	ErrNotEnoughDice         = errors.New("not enough dice")
 	ErrUserHasBeenRegister   = errors.New("err user has been register")
 	ErrInvalidParams         = errors.New("error invalid params")
 )

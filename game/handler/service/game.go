@@ -235,7 +235,7 @@ func (ref *Game) GameRandom(ctx context.Context, userId string, level int) (int,
 		return 0, 0, 0, err
 	}
 	if totalScore < totalScoreUsed+uint64(amount) {
-		return 0, 0, 0, fmt.Errorf("not enough score")
+		return 0, 0, 0, derrors.ErrNotEnoughDice
 	}
 	profile, err := ref.userService.Profile(ctx, &proto.UserMutualReq{TargetUserId: userId})
 	if err != nil {

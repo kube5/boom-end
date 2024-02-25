@@ -119,8 +119,8 @@ func (a *Account) Stop(sd fx.Shutdowner) error {
 
 func (a *Account) LoginPreByMetaMask(ctx context.Context, publicAddress string) (string, error) {
 	nonce := time.Now().GoString()
-	signText := "Welcome to rollie!\n\n" +
-		"Click to sign in and accept the rollie Terms of Service: https://rollie.finance/\n\n" +
+	signText := "Welcome to boomup.fun!\n\n" +
+		"Click to sign in and accept the boomup.fun Terms of Service: https://boomup.fun/\n\n" +
 		"This request will not trigger a blockchain transaction or cost any gas fees.\n\n" +
 		"Your authentication status will reset after 24 hours.\n\n" +
 		"Wallet address:\n" +

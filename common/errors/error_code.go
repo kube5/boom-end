@@ -99,7 +99,7 @@ var errorCodeMap = map[string]uint32{
 	ErrInvalidProjectId.Error():        12005,
 
 	ErrUserPostTooFrequently.Error(): 13009,
-	ErrNotEnoughScore.Error():        13010,
+	ErrNotEnoughDice.Error():         13010,
 
 	// monitor
 	ErrBlockchainNotFound.Error():      16001,

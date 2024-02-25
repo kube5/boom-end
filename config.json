@@ -4,14 +4,14 @@
   },
   "blockchains": [
     {
-      "chain_id": 534351,
+      "chain_id": 168587773,
       "rpc_urls": [
         "https://rpc.ankr.com/scroll_sepolia_testnet",
         "https://scroll-sepolia.blockpi.network/v1/rpc/public",
         "https://scroll-sepolia.chainstacklabs.com"
       ],
       "wss_urls" : [
-        "wss://scroll-sepolia.blockpi.network/v1/ws/cbf79cf41780d8bc71d70ea7d98d97cebd01a6c0"
+        "wss://intensive-long-lake.blast-sepolia.quiknode.pro/2225c36f48c63b42f0e9931fccb6106baa6354ff/"
       ],
       "filter_step": 1024,
       "multicall": "0xcA11bde05977b3631167028862bE2a173976CA11",
@@ -38,7 +38,7 @@
       "password": "",
       "ip": "127.0.0.1",
       "port": 3371,
-      "db_name": "mu"
+      "db_name": "boom"
     }
   },
   "redis": {
@@ -70,9 +70,9 @@
   "contracts": [
     {
       "_comment": "Staking",
-      "chain_id": 534351,
-      "address": "0x76b5a255027A11434C60fE42B464fe5Ed026C3Ce",
-      "start_block": 2894976,
+      "chain_id": 168587773,
+      "address": "0xB747Aa796A7804982Fc9EB20354eA63aB17E7906",
+      "start_block": 2083667,
       "contract_type": 0
     }
   ]

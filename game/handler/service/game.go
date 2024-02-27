@@ -62,7 +62,7 @@ type Game struct {
 func (ref *Game) Start(sd fx.Shutdowner) error {
 	go func() {
 		var wg = 0
-		ticker := time.NewTicker(time.Second * 5)
+		ticker := time.NewTicker(time.Minute * 5)
 		defer ticker.Stop()
 		for {
 			select {
@@ -72,7 +72,7 @@ func (ref *Game) Start(sd fx.Shutdowner) error {
 				if wg == 1 {
 					continue
 				}
-				nextHour := now.Truncate(time.Minute).Add(time.Minute)
+				nextHour := now.Truncate(time.Hour).Add(time.Hour)
 				time.AfterFunc(nextHour.Sub(now), func() {
 					ref.Logger.Infof("do self:%s", time.Now().Format("2006-01-02 15:04:05"))
 					if err := ref.Cron(context.Background()); err != nil {

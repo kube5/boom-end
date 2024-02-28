@@ -40,33 +40,6 @@ func (w *Game) MissionProfile(ctx context.Context, req *proto.UserIdReq, resp *p
 		return err
 	}
 
-	typeScore, err := w.gs.QueryTotalTypeScore(ctx, req.Id)
-	if err != nil {
-		return err
-	}
-
-	for scoreType, score := range typeScore {
-		resp.ScoreAccuracy = common2.MissionTypeMap[scoreType].ScoreAccuracy
-		scoreDetail := proto.Mission{
-			Name:          common2.MissionTypeMap[scoreType].Name,
-			Desc:          common2.MissionTypeMap[scoreType].Desc,
-			ScoreAccuracy: common2.MissionTypeMap[scoreType].ScoreAccuracy,
-			ScoreType:     scoreType,
-			ScoreAmount:   score,
-			Daily:         common2.MissionTypeMap[scoreType].Daily,
-			MissionScore:  common2.MissionTypeMap[scoreType].ScoreAmount,
-		}
-		scoreDetail.Undo = true
-		if scoreDetail.Daily {
-			checkDailyMission, err := w.gs.CheckDailyMission(ctx, req.Id, scoreType)
-			if err != nil {
-				return err
-			}
-			scoreDetail.Undo = checkDailyMission
-		}
-		resp.Mission = append(resp.Mission, &scoreDetail)
-	}
-
 	resp.Id = req.Id
 	resp.Score = score
 	resp.ScoreUsed = scoreUsed

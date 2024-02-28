@@ -65,11 +65,8 @@ message ConsumeListResp {
 message MissionProfileResp {
   string id = 1;
   uint64 score = 2;
-  uint64 score_accuracy = 3;
-  repeated Mission mission= 4;
-  uint64 score_used = 5;
-//  repeated Consume consume = 6;
-  uint64 cash = 7;
+  uint64 score_used = 3;
+  uint64 cash = 4;
 }
 
 message Consume {

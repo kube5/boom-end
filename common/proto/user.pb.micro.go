@@ -44,7 +44,7 @@ type UserService interface {
 	Profile(ctx context.Context, in *UserMutualReq, opts ...client.CallOption) (*ProfileResp, error)
 	UpdateUser(ctx context.Context, in *UpdateUserReq, opts ...client.CallOption) (*Empty, error)
 	FindUserIdByWallet(ctx context.Context, in *Wallet, opts ...client.CallOption) (*UserIdResp, error)
-	//--------------internal-------------------
+	// --------------internal-------------------
 	LoginInternal(ctx context.Context, in *LoginInternalReq, opts ...client.CallOption) (*LoginByMetaMaskResp, error)
 }
 
@@ -161,7 +161,7 @@ type UserHandler interface {
 	Profile(context.Context, *UserMutualReq, *ProfileResp) error
 	UpdateUser(context.Context, *UpdateUserReq, *Empty) error
 	FindUserIdByWallet(context.Context, *Wallet, *UserIdResp) error
-	//--------------internal-------------------
+	// --------------internal-------------------
 	LoginInternal(context.Context, *LoginInternalReq, *LoginByMetaMaskResp) error
 }
 

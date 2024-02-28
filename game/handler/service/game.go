@@ -22,7 +22,7 @@ import (
 )
 
 type GameService interface {
-	DoMission(ctx context.Context, userId, address string, score int64) error
+	DoMission(ctx context.Context, userId string, mission common.Mission) error
 	Cron(ctx context.Context) error
 	GameRandom(ctx context.Context, userId string, level int) (int, int, int, error)
 	LeaderBoard(ctx context.Context, userId string, limit uint64) ([]*proto.LeaderBoardResp_LeaderBoardItem, *proto.LeaderBoardResp_LeaderBoardItem, error)
@@ -105,26 +105,27 @@ func (a *Game) Cron(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		if err := a.DoMission(ctx, user.Id, wallet, int64(user.UserInfo.DiceSpeed)); err != nil {
+		mission := common.MissionCron
+		mission.ScoreAmount = user.UserInfo.DiceSpeed
+		if err := a.DoMission(ctx, user.Id, mission); err != nil {
 			a.Logger.Errorf("do mission for user [%s] err [%s]", wallet, err.Error())
 		}
 	}
 	return nil
 }
 
-func (a *Game) DoMission(ctx context.Context, userId, address string, score int64) error {
-	if len(address) == 0 || len(userId) == 0 {
-		a.Logger.Warnf("cannot found address [%s] user", address)
+func (a *Game) DoMission(ctx context.Context, userId string, mission common.Mission) error {
+	if len(userId) == 0 {
+		a.Logger.Warnf("cannot found userId [%s] user", userId)
 		return nil
 	}
-
 	if err := a.AddScoreHistory(&dto.UserScoreHistory{
 		UUID:   uuid.GenUUID().Encode(),
 		UserID: userId,
-		Score:  score,
-		Type:   0,
-		Desc:   "",
-		DescId: "",
+		Score:  int64(mission.ScoreAmount),
+		Type:   mission.ScoreType,
+		Desc:   mission.Desc,
+		DescId: mission.DescId,
 	}); err != nil {
 		return err
 	}

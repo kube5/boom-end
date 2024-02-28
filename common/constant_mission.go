@@ -41,75 +41,27 @@ type Mission struct {
 }
 
 var Missions = []Mission{
-	MissionCheckIn, MissionTweet, MissionInvite, MissionTrading, MissionBridging, MissionDeposit, MissionReferralFather, MissionReferralGrand,
+	MissionCheckIn, MissionReferralFather, MissionReferralGrand,
 }
 
 var MissionCheckIn = Mission{
-	ScoreType:     1,
-	Name:          "CheckIn",
-	Desc:          "Check in daily",
-	ScoreAccuracy: ScoreAccuracy,
-	ScoreAmount:   5,
-	Daily:         true,
-	Referral:      false,
-}
-
-var MissionTweet = Mission{
 	ScoreType:     2,
-	Name:          "Tweet",
-	Desc:          "Post a tweet daily",
+	Name:          "CheckIn",
+	Desc:          "Check in Register",
 	ScoreAccuracy: ScoreAccuracy,
-	ScoreAmount:   10,
-	Daily:         true,
-	Referral:      false,
-}
-
-var MissionInvite = Mission{
-	ScoreType:     3,
-	Name:          "Invite",
-	Desc:          "Invite a user",
-	ScoreAccuracy: ScoreAccuracy,
-	ScoreAmount:   10,
+	ScoreAmount:   50,
 	Daily:         false,
 	Referral:      false,
 }
 
-var MissionTrading = Mission{
-	ScoreType:     4,
-	Name:          "Trading",
-	Desc:          "Exec one trade",
+var MissionCron = Mission{
+	ScoreType:     1,
+	Name:          "Cron",
+	Desc:          "Cron every hour",
 	ScoreAccuracy: ScoreAccuracy,
-
-	Daily:            false,
-	Referral:         true,
-	ReferralMissions: []Mission{MissionReferralFather, MissionReferralGrand},
-	ScoreLimit:       10000,
-	ScoreStart:       10,
-	ScoreRule:        tradingScoreRule,
-}
-
-var MissionBridging = Mission{
-	ScoreType:     5,
-	Name:          "Bridging",
-	Desc:          "Exec one Bridging",
-	ScoreAccuracy: ScoreAccuracy,
-
-	Daily:            false,
-	Referral:         true,
-	ReferralMissions: []Mission{MissionReferralFather, MissionReferralGrand},
-	ScoreRule:        bridgingScoreRule,
-}
-
-var MissionDeposit = Mission{
-	ScoreType:     6,
-	Name:          "Deposit",
-	Desc:          "Exec one Deposit",
-	ScoreAccuracy: ScoreAccuracy,
-
-	Daily:            false,
-	Referral:         true,
-	ReferralMissions: []Mission{MissionReferralFather, MissionReferralGrand},
-	ScoreRule:        depositScoreRule,
+	ScoreAmount:   0,
+	Daily:         false,
+	Referral:      false,
 }
 
 var MissionReferralFather = Mission{

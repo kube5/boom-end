@@ -122,7 +122,7 @@ func (w *Game) ConsumeList(ctx context.Context, req *proto.ConsumeListReq, resp 
 }
 
 func (w *Game) MissionCheckIn(ctx context.Context, req *proto.UserIdReq, empty *proto.Empty) error {
-	return nil
+	return w.gs.DoMission(ctx, req.Id, common2.MissionCheckIn)
 }
 
 func (w *Game) MissionTweet(ctx context.Context, req *proto.MissionTweetReq, empty *proto.Empty) error {

@@ -157,7 +157,7 @@ func (a *Account) LoginByMetaMask(ctx context.Context, publicAddress, signature 
 			UUID:   uuid.GenUUID().Encode(),
 			Wallet: publicAddress,
 		}
-		if err := a.userDao.Create(user); err != nil {
+		if err := a.CreateUser(ctx, user); err != nil {
 			return nil, err
 		}
 		a.Logger.Infof("New user[%s] with address[%s] is registering", user.UUID, user.Wallet)
@@ -189,7 +189,7 @@ func (a *Account) LoginInternal(ctx context.Context, publicAddress string) (*mod
 			UUID:   uuid.GenUUID().Encode(),
 			Wallet: publicAddress,
 		}
-		if err := a.userDao.Create(user); err != nil {
+		if err := a.CreateUser(ctx, user); err != nil {
 			return nil, err
 		}
 		a.Logger.Infof("New user[%s] with address[%s] is registering", user.UUID, user.Wallet)
@@ -256,7 +256,7 @@ func (a *Account) UpdateUserByWallet(ctx context.Context, user *dto.User) error 
 			MintDice:          user.MintDice,
 			DiceSpeed:         user.DiceSpeed,
 		}
-		if err := a.userDao.Create(newUser); err != nil {
+		if err := a.CreateUser(ctx, newUser); err != nil {
 			return err
 		}
 		a.Logger.Infof("New user[%s] with address[%s] is registering", user.UUID, user.Wallet)
@@ -272,6 +272,17 @@ func (a *Account) UpdateUserByWallet(ctx context.Context, user *dto.User) error 
 		}
 		return a.userCache.SetUser(user)
 	}
+}
+
+func (a *Account) CreateUser(ctx context.Context, user *dto.User) error {
+	if err := a.userDao.Create(user); err != nil {
+		return err
+	}
+	_, err := a.gameService.MissionCheckIn(ctx, &proto.UserIdReq{Id: user.UUID})
+	if err != nil {
+		a.Logger.Errorf("MissionCheckIn err:%s", err.Error())
+	}
+	return nil
 }
 
 func (a *Account) FindUserIdByWallet(ctx context.Context, wallet string) (string, error) {

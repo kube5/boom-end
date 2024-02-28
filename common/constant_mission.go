@@ -10,7 +10,7 @@ import (
 const (
 	MissionReferralFatherType = 7
 	MissionReferralGrandType  = 8
-	ScoreAccuracy             = 10
+	ScoreAccuracy             = 1
 )
 
 func init() {

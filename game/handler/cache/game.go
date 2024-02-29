@@ -189,7 +189,7 @@ func (u *Game) GetLeaderBoardUser(userId string) (uint64, error) {
 }
 
 func (u *Game) GetLeaderBoardUserScore(userId string) (int64, error) {
-	val, err := u.ZRank(ctx, topIndexLB(), userId).Uint64()
+	val, err := u.ZRevRank(ctx, topIndexLB(), userId).Uint64()
 	if err == redis_client.Nil {
 		return -1, nil
 	}

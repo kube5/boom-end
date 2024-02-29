@@ -306,9 +306,10 @@ func (ref *Game) LeaderBoard(ctx context.Context, userId string, limit uint64) (
 		if err != nil {
 			return nil, nil, err
 		}
-		if 0 == rank {
+		if -1 == rank {
 			return items, nil, nil
 		}
+		rank++
 		cash, err := ref.gameCache.GetLeaderBoardUser(user.Id)
 		if err != nil {
 			return nil, nil, err
@@ -316,7 +317,7 @@ func (ref *Game) LeaderBoard(ctx context.Context, userId string, limit uint64) (
 		return items, &proto.LeaderBoardResp_LeaderBoardItem{
 			Wallet: user.UserInfo.Wallet,
 			Cash:   cash,
-			Rank:   rank,
+			Rank:   uint64(rank),
 		}, nil
 	} else {
 		return items, nil, nil

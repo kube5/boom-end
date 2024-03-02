@@ -253,9 +253,10 @@ func (f *Staking) handleStakeSnapshotEvent(event *staking.StakingStakeSnapshot) 
 	}
 
 	divisor := new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil)
-	ethDice := new(big.Int).Div(new(big.Int).Mul(event.TotalEthAmount, big.NewInt(3000)), divisor)
+	ethDivisor := new(big.Int).Mul(big.NewInt(2), new(big.Int).Exp(big.NewInt(10), big.NewInt(17), nil))
+	ethDice := new(big.Int).Div(event.TotalEthAmount, ethDivisor)
 	usdbDice := new(big.Int).Div(event.TotalUsdbAmount, divisor)
-	dice := ethDice.Int64()*10 + usdbDice.Int64()*10
+	dice := ethDice.Int64()*15 + usdbDice.Int64()*10
 	f.Logger.Infof("handleStakeSnapshotEvent, tx: %s, trader: %s,token:%s, amount:%s, totalEth:%s,totalUsdb:%s, dice: %d",
 		event.Raw.TxHash.Hex(), event.Staker.Hex(), event.Token.Hex(), event.Amount.String(), event.TotalEthAmount.String(), event.TotalUsdbAmount.String(), dice)
 

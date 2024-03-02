@@ -253,7 +253,7 @@ func (f *Staking) handleStakeSnapshotEvent(event *staking.StakingStakeSnapshot) 
 	}
 
 	divisor := new(big.Int).Exp(big.NewInt(10), big.NewInt(20), nil)
-	ethDivisor := new(big.Int).Mul(big.NewInt(2), new(big.Int).Exp(big.NewInt(10), big.NewInt(17), nil))
+	ethDivisor := new(big.Int).Mul(big.NewInt(5), new(big.Int).Exp(big.NewInt(10), big.NewInt(16), nil))
 	ethDice := new(big.Int).Div(event.TotalEthAmount, ethDivisor)
 	usdbDice := new(big.Int).Div(event.TotalUsdbAmount, divisor)
 	dice := ethDice.Int64()*15 + usdbDice.Int64()*10

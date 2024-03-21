@@ -223,7 +223,7 @@ func (a *Account) RefreshToken(ctx context.Context, refreshUuid, accessUuid, use
 	}
 
 	deleted, err = a.userCache.DeleteAuth(userId, accessUuid)
-	if deleted == 0 || err != nil {
+	if err != nil {
 		return nil, derrors.ErrAuthValidationExpired
 	}
 	td, err := utils.CreateToken(userId)

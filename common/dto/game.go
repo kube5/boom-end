@@ -49,6 +49,9 @@ type UserCashHistory struct {
 	UserScoreUsedHistoryID string `json:"user_score_used_history_id" gorm:"column:user_score_used_history_id;type:char(32);"`
 	UserID                 string `json:"user_id" gorm:"column:user_id;type:char(32);"`
 	Cash                   int64  `json:"cash" gorm:"column:cash;type:bigint;not null"`
+	Dice1                  int64  `json:"dice1" gorm:"column:dice1;type:bigint;not null"`
+	Dice2                  int64  `json:"dice2" gorm:"column:dice2;type:bigint;not null"`
+	Level                  int64  `json:"level" gorm:"column:level;type:bigint;not null"`
 
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`

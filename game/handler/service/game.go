@@ -259,6 +259,9 @@ func (ref *Game) GameRandom(ctx context.Context, userId string, level int) (int,
 			UserScoreUsedHistoryID: scoreUsedHis.UUID,
 			UserID:                 userId,
 			Cash:                   int64(cash),
+			Dice1:                  int64(dice1),
+			Dice2:                  int64(dice2),
+			Level:                  int64(level),
 		}
 		if err := ref.AddCashHistory(cashHistory); err != nil {
 			return err

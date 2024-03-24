@@ -140,9 +140,8 @@ func (s *Server) init() error {
 
 	}
 
-	t := s.router.Group("/api/tg/v1")
+	t := v.Group("/tg")
 	{
-
 		ug := t.Group("/user")
 		ug.GET("/profile", s.apiHandlerWrap(s.TGProfile))
 

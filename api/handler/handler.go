@@ -140,9 +140,32 @@ func (s *Server) init() error {
 
 	}
 
+	t := s.router.Group("/api/tg/v1")
+	{
+
+		ug := t.Group("/user")
+		ug.GET("/profile", s.apiHandlerWrap(s.TGProfile))
+
+		ug.POST("/tg_login_pre", s.apiHandlerWrap(s.TGMetaMaskLoginPre))
+		ug.POST("/tg_login", s.apiHandlerWrap(s.TGMetaMaskLogin))
+		ug.POST("/refresh_token", s.apiHandlerWrap(s.TGRefreshToken))
+		ug.POST("/logout", s.TGTokenAuthMiddleware(), s.apiHandlerWrap(s.TGLogout))
+
+		//mg := v.Group("/mission")
+		//mg.GET("/profile", s.TokenAuthMiddleware(), s.apiHandlerWrap(s.MissionProfile))
+
+		gg := v.Group("/game")
+		gg.POST("/action/random", s.TGTokenAuthMiddleware(), s.apiHandlerWrap(s.GameRandom))
+
+		lg := v.Group("/leaderboard")
+		lg.GET("/", s.apiHandlerWrap(s.LeaderBoard))
+
+	}
+
 	i := s.router.Group("/api/internal")
 	{
 		i.GET("/wallet_login", s.apiHandlerWrap(s.LoginInternal))
+		i.GET("/wallet_login2", s.apiHandlerWrap(s.TGLoginInternal))
 	}
 
 	// debug enable pprof

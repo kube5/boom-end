@@ -36,9 +36,6 @@ type UserService interface {
 
 var _ UserService = (*Account)(nil)
 
-const DistributionLockExpire = 5 * time.Second
-const InviteCodeLockKey = "{LOCK}-InviteCodeLock"
-
 type Account struct {
 	BaseService
 	repo.CommonComponents

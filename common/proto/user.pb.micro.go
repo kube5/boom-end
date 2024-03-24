@@ -46,6 +46,12 @@ type UserService interface {
 	FindUserIdByWallet(ctx context.Context, in *Wallet, opts ...client.CallOption) (*UserIdResp, error)
 	// --------------internal-------------------
 	LoginInternal(ctx context.Context, in *LoginInternalReq, opts ...client.CallOption) (*LoginByMetaMaskResp, error)
+	// --------------tg-------------------
+	LoginPreByTG(ctx context.Context, in *LoginPreByTGReq, opts ...client.CallOption) (*LoginPreByTGResp, error)
+	ProfileTG(ctx context.Context, in *UserMutualReq, opts ...client.CallOption) (*ProfileResp, error)
+	LoginByTg(ctx context.Context, in *LoginTgReq, opts ...client.CallOption) (*LoginTgResp, error)
+	TgRefreshToken(ctx context.Context, in *RefreshTokenReq, opts ...client.CallOption) (*RefreshTokenResp, error)
+	TGLogout(ctx context.Context, in *LogoutReq, opts ...client.CallOption) (*Empty, error)
 }
 
 type userService struct {
@@ -150,6 +156,56 @@ func (c *userService) LoginInternal(ctx context.Context, in *LoginInternalReq, o
 	return out, nil
 }
 
+func (c *userService) LoginPreByTG(ctx context.Context, in *LoginPreByTGReq, opts ...client.CallOption) (*LoginPreByTGResp, error) {
+	req := c.c.NewRequest(c.name, "User.LoginPreByTG", in)
+	out := new(LoginPreByTGResp)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) ProfileTG(ctx context.Context, in *UserMutualReq, opts ...client.CallOption) (*ProfileResp, error) {
+	req := c.c.NewRequest(c.name, "User.ProfileTG", in)
+	out := new(ProfileResp)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) LoginByTg(ctx context.Context, in *LoginTgReq, opts ...client.CallOption) (*LoginTgResp, error) {
+	req := c.c.NewRequest(c.name, "User.LoginByTg", in)
+	out := new(LoginTgResp)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) TgRefreshToken(ctx context.Context, in *RefreshTokenReq, opts ...client.CallOption) (*RefreshTokenResp, error) {
+	req := c.c.NewRequest(c.name, "User.TgRefreshToken", in)
+	out := new(RefreshTokenResp)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) TGLogout(ctx context.Context, in *LogoutReq, opts ...client.CallOption) (*Empty, error) {
+	req := c.c.NewRequest(c.name, "User.TGLogout", in)
+	out := new(Empty)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for User service
 
 type UserHandler interface {
@@ -163,6 +219,12 @@ type UserHandler interface {
 	FindUserIdByWallet(context.Context, *Wallet, *UserIdResp) error
 	// --------------internal-------------------
 	LoginInternal(context.Context, *LoginInternalReq, *LoginByMetaMaskResp) error
+	// --------------tg-------------------
+	LoginPreByTG(context.Context, *LoginPreByTGReq, *LoginPreByTGResp) error
+	ProfileTG(context.Context, *UserMutualReq, *ProfileResp) error
+	LoginByTg(context.Context, *LoginTgReq, *LoginTgResp) error
+	TgRefreshToken(context.Context, *RefreshTokenReq, *RefreshTokenResp) error
+	TGLogout(context.Context, *LogoutReq, *Empty) error
 }
 
 func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
@@ -176,6 +238,11 @@ func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.Handl
 		UpdateUser(ctx context.Context, in *UpdateUserReq, out *Empty) error
 		FindUserIdByWallet(ctx context.Context, in *Wallet, out *UserIdResp) error
 		LoginInternal(ctx context.Context, in *LoginInternalReq, out *LoginByMetaMaskResp) error
+		LoginPreByTG(ctx context.Context, in *LoginPreByTGReq, out *LoginPreByTGResp) error
+		ProfileTG(ctx context.Context, in *UserMutualReq, out *ProfileResp) error
+		LoginByTg(ctx context.Context, in *LoginTgReq, out *LoginTgResp) error
+		TgRefreshToken(ctx context.Context, in *RefreshTokenReq, out *RefreshTokenResp) error
+		TGLogout(ctx context.Context, in *LogoutReq, out *Empty) error
 	}
 	type User struct {
 		user
@@ -222,4 +289,24 @@ func (h *userHandler) FindUserIdByWallet(ctx context.Context, in *Wallet, out *U
 
 func (h *userHandler) LoginInternal(ctx context.Context, in *LoginInternalReq, out *LoginByMetaMaskResp) error {
 	return h.UserHandler.LoginInternal(ctx, in, out)
+}
+
+func (h *userHandler) LoginPreByTG(ctx context.Context, in *LoginPreByTGReq, out *LoginPreByTGResp) error {
+	return h.UserHandler.LoginPreByTG(ctx, in, out)
+}
+
+func (h *userHandler) ProfileTG(ctx context.Context, in *UserMutualReq, out *ProfileResp) error {
+	return h.UserHandler.ProfileTG(ctx, in, out)
+}
+
+func (h *userHandler) LoginByTg(ctx context.Context, in *LoginTgReq, out *LoginTgResp) error {
+	return h.UserHandler.LoginByTg(ctx, in, out)
+}
+
+func (h *userHandler) TgRefreshToken(ctx context.Context, in *RefreshTokenReq, out *RefreshTokenResp) error {
+	return h.UserHandler.TgRefreshToken(ctx, in, out)
+}
+
+func (h *userHandler) TGLogout(ctx context.Context, in *LogoutReq, out *Empty) error {
+	return h.UserHandler.TGLogout(ctx, in, out)
 }

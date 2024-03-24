@@ -11,6 +11,7 @@ func init() {
 	base.RegisterComponents(
 		NewBaseService,
 		NewAuthService,
+		NewTgUserService,
 		NewGameService,
 	)
 }

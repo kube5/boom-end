@@ -17,6 +17,25 @@ service User{
 
   //--------------internal-------------------
   rpc LoginInternal(LoginInternalReq) returns (LoginByMetaMaskResp);
+
+  //--------------tg-------------------
+  rpc LoginPreByTG(LoginPreByTGReq) returns (LoginPreByTGResp);
+  rpc ProfileTG(UserMutualReq) returns (ProfileResp);
+  rpc LoginByTg(LoginTgReq) returns (LoginTgResp);
+  rpc TgRefreshToken(RefreshTokenReq) returns (RefreshTokenResp);
+  rpc TGLogout(LogoutReq) returns (proto.Empty);
+}
+
+message LoginTgReq {
+  string public_address = 1;
+  string signature = 2;
+}
+
+message LoginTgResp {
+  string access_token = 1;
+  string refresh_token = 2;
+  int64 at_expires = 3;
+  int64 rt_expires = 4;
 }
 
 
@@ -70,6 +89,15 @@ message LoginPreByMetaMaskReq {
 
 
 message LoginPreByMetaMaskResp {
+  string nonce = 1;
+}
+
+message LoginPreByTGReq {
+  string public_address = 1;
+}
+
+
+message LoginPreByTGResp {
   string nonce = 1;
 }
 

@@ -26,6 +26,7 @@ func init() {
 type userHandler struct {
 	repo.CommonComponents
 	us            service.UserService
+	tus           service.TgUserService
 	s3Uploader    *s3manager.Uploader
 	presignClient *s3.PresignClient
 }
@@ -96,7 +97,7 @@ func (i *userHandler) Profile(ctx context.Context, req *proto.UserMutualReq, res
 }
 
 func NewUserHandler(commonComponents repo.CommonComponents,
-	us service.UserService) (proto.UserHandler, error) {
+	us service.UserService, tus service.TgUserService) (proto.UserHandler, error) {
 	s3Config := commonComponents.Cfg.S3
 	creds := credentials.NewStaticCredentials(s3Config.AccessKeyId, s3Config.AccessKeySecret, "")
 	sess, err := session.NewSession(&aws.Config{
@@ -118,9 +119,62 @@ func NewUserHandler(commonComponents repo.CommonComponents,
 	return &userHandler{
 		CommonComponents: commonComponents,
 		us:               us,
+		tus:              tus,
 		s3Uploader:       s3manager.NewUploader(sess),
 		presignClient:    presignClient,
 	}, nil
+}
+
+func (i *userHandler) LoginPreByTG(ctx context.Context, req *proto.LoginPreByTGReq, resp *proto.LoginPreByTGResp) error {
+	nonce, err := i.tus.LoginPreByMetaMask(ctx, req.PublicAddress)
+	if err != nil {
+		return err
+	}
+	resp.Nonce = nonce
+	return nil
+}
+
+func (i *userHandler) ProfileTG(ctx context.Context, req *proto.UserMutualReq, resp *proto.ProfileResp) error {
+	id := req.Id
+	if len(req.TargetUserId) != 0 {
+		id = req.TargetUserId
+	}
+	var user *dto.TgUser
+	var err error
+	if len(id) == 0 {
+		user, err = i.tus.QueryTgUserByWallet(ctx, req.Wallet)
+		if err != nil {
+			return err
+		}
+	} else {
+		user, err = i.tus.QueryTgUser(ctx, id)
+		if err != nil {
+			return err
+		}
+	}
+
+	resp.Id = user.UUID
+	resp.UserInfo = &proto.BasicUserInfo{
+		Username:   user.Tgname,
+		Wallet:     user.Wallet,
+		UserId:     user.UUID,
+		ProfileUrl: user.ProfileUrl,
+		MintDice:   user.MintDice,
+		DiceSpeed:  user.DiceSpeed,
+	}
+	return nil
+}
+
+func (i *userHandler) LoginByTg(ctx context.Context, req *proto.LoginTgReq, resp *proto.LoginTgResp) error {
+	token, err := i.tus.LoginInternal(ctx, req.PublicAddress)
+	if err != nil {
+		return err
+	}
+	resp.AccessToken = token.AccessToken
+	resp.AtExpires = int64(token.AtExpires)
+	resp.RefreshToken = token.RefreshToken
+	resp.RtExpires = int64(token.RtExpires)
+	return nil
 }
 
 func (i *userHandler) LoginPreByMetaMask(ctx context.Context, req *proto.LoginPreByMetaMaskReq, resp *proto.LoginPreByMetaMaskResp) error {
@@ -158,6 +212,22 @@ func (i *userHandler) RefreshToken(ctx context.Context, req *proto.RefreshTokenR
 
 func (i *userHandler) Logout(ctx context.Context, req *proto.LogoutReq, empty *proto.Empty) error {
 	return i.us.Logout(ctx, req.AccessUuid, req.UserId)
+}
+
+func (i *userHandler) TgRefreshToken(ctx context.Context, req *proto.RefreshTokenReq, resp *proto.RefreshTokenResp) error {
+	token, err := i.tus.RefreshToken(ctx, req.RefreshUuid, req.AccessUuid, req.UserId)
+	if err != nil {
+		return err
+	}
+	resp.AccessToken = token.AccessToken
+	resp.AtExpires = int64(token.AtExpires)
+	resp.RefreshToken = token.RefreshToken
+	resp.RtExpires = int64(token.RtExpires)
+	return nil
+}
+
+func (i *userHandler) TGLogout(ctx context.Context, req *proto.LogoutReq, empty *proto.Empty) error {
+	return i.tus.Logout(ctx, req.AccessUuid, req.UserId)
 }
 
 func (i *userHandler) Call(ctx context.Context, empty *proto.Empty, empty2 *proto.Empty) error {

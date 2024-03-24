@@ -6,5 +6,6 @@ func init() {
 	base.RegisterComponents(
 		NewBaseDao,
 		NewUserDao,
+		NewTgUserDao,
 	)
 }

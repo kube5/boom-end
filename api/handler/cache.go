@@ -19,11 +19,17 @@ func NewRedis(cfg repo.CommonComponents) (*redis.Cache, error) {
 
 type TokenCache interface {
 	FetchAuth(authD *model.AccessDetails) error
+	TGFetchAuth(authD *model.AccessDetails) error
 	NonceVerify(nonce string) error
 }
 
 type Token struct {
 	*redis.Cache
+}
+
+func (t *Token) TGFetchAuth(authD *model.AccessDetails) error {
+	_, err := t.Get(ctx, tgauthKey(authD.UserId, authD.AccessUuid)).Result()
+	return err
 }
 
 func NewTokenCache(cache *redis.Cache) (TokenCache, error) {
@@ -37,6 +43,10 @@ func (t *Token) FetchAuth(authD *model.AccessDetails) error {
 
 func authKey(userId string, givenUuid string) string {
 	return fmt.Sprintf("{Auth}Auth-%s-%s", userId, givenUuid)
+}
+
+func tgauthKey(userId string, givenUuid string) string {
+	return fmt.Sprintf("{Authtg}Auth-%s-%s", userId, givenUuid)
 }
 
 func nonceKey(nonce string) string {

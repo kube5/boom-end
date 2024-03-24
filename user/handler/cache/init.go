@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	base.RegisterComponents(NewRedis, NewUserCache)
+	base.RegisterComponents(NewRedis, NewUserCache, NewTgUserCache)
 }
 
 func NewRedis(cfg repo.CommonComponents) (*redis.Cache, error) {

@@ -153,10 +153,10 @@ func (s *Server) init() error {
 		//mg := v.Group("/mission")
 		//mg.GET("/profile", s.TokenAuthMiddleware(), s.apiHandlerWrap(s.MissionProfile))
 
-		gg := v.Group("/game")
+		gg := t.Group("/game")
 		gg.POST("/action/random", s.TGTokenAuthMiddleware(), s.apiHandlerWrap(s.GameRandom))
 
-		lg := v.Group("/leaderboard")
+		lg := t.Group("/leaderboard")
 		lg.GET("/", s.apiHandlerWrap(s.LeaderBoard))
 
 	}

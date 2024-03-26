@@ -16,6 +16,7 @@ import (
 type Game struct {
 	repo.CommonComponents
 	gs           service.GameService
+	tgs          service.TGGameService
 	tvs          service.StakingService
 	userService  proto.UserService
 	tweetLimiter *social.TweetRateLimiter
@@ -135,11 +136,13 @@ func init() {
 
 func NewGame(c repo.CommonComponents,
 	gs service.GameService,
+	tgs service.TGGameService,
 	userService proto.UserService,
 	tvs service.StakingService) (proto.GameHandler, error) {
 	return &Game{
 		CommonComponents: c,
 		gs:               gs,
+		tgs:              tgs,
 		tweetLimiter:     social.NewRateLimiter(),
 		tvs:              tvs,
 		userService:      userService,
@@ -168,5 +171,36 @@ func (w *Game) GameRandom(ctx context.Context, req *proto.GameRandomReq, resp *p
 	resp.Cash = uint64(score)
 	resp.Dice1 = uint64(dice1)
 	resp.Dice2 = uint64(dice2)
+	return nil
+}
+
+func (w *Game) TGGameRandom(ctx context.Context, req *proto.GameRandomReq, resp *proto.GameRandomResp) error {
+	dice1, dice2, score, err := w.tgs.TGGameRandom(ctx, req.UserId, int(req.Level))
+	if err != nil {
+		return err
+	}
+	resp.Cash = uint64(score)
+	resp.Dice1 = uint64(dice1)
+	resp.Dice2 = uint64(dice2)
+	return nil
+}
+
+func (w *Game) TGLeaderBoard(ctx context.Context, req *proto.LeaderBoardReq, resp *proto.LeaderBoardResp) error {
+	items, self, err := w.tgs.LeaderBoard(ctx, req.UserId, req.Limit)
+	if err != nil {
+		return err
+	}
+	resp.Items = items
+	resp.Self = self
+	return nil
+}
+
+func (w *Game) Game24H(ctx context.Context, req *proto.Game24HReq, resp *proto.Game24HResp) error {
+	amount, err := w.tgs.Game24H(ctx, req.UserId)
+	if err != nil {
+		return err
+	}
+	resp.Amount = amount
+	resp.UserId = req.UserId
 	return nil
 }

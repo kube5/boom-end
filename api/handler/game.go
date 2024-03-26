@@ -19,11 +19,6 @@ func (s *Server) GameRandom(ctx *context.Context, c *gin.Context) (res interface
 		Level:  uint64(req.Level),
 		UserId: token.UserId})
 }
-func (s *Server) GameGetCode(ctx *context.Context, c *gin.Context) (res interface{}, err error) {
-	token := c.MustGet(AccessDetails).(*model.AccessDetails)
-	return s.gameService.GameGetInviteCode(ctx.Ctx(), &pb.UserIdReq{
-		Id: token.UserId})
-}
 
 func (s *Server) LeaderBoard(ctx *context.Context, c *gin.Context) (res interface{}, err error) {
 	token, err := s.ExtractTokenMetadata(c)

@@ -31,6 +31,18 @@ type userHandler struct {
 	presignClient *s3.PresignClient
 }
 
+func (i *userHandler) AddDiceSpeed(ctx context.Context, req *proto.AddDiceSpeedReq, empty *proto.Empty) error {
+	return i.tus.AddDiceSpeed(ctx, req.Id, req.Dice, req.Desc)
+}
+
+func (i *userHandler) SetUserVIP(ctx context.Context, req *proto.SetUserVIPReq, empty *proto.Empty) error {
+	return i.tus.SetUserVIP(ctx, req.Id, req.Hash)
+}
+
+func (i *userHandler) SetUserDiceMint(ctx context.Context, req *proto.SetUserDiceMintReq, empty *proto.Empty) error {
+	return i.tus.SetUserDiceMint(ctx, req.Id, req.Hash)
+}
+
 func (i *userHandler) UpdateUser(ctx context.Context, req *proto.UpdateUserReq, empty *proto.Empty) error {
 	return i.us.UpdateUserByWallet(ctx, &dto.User{
 		Wallet:            req.Wallet,

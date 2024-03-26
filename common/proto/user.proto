@@ -24,6 +24,24 @@ service User{
   rpc LoginByTg(LoginTgReq) returns (LoginTgResp);
   rpc TgRefreshToken(RefreshTokenReq) returns (RefreshTokenResp);
   rpc TGLogout(LogoutReq) returns (proto.Empty);
+  rpc AddDiceSpeed(AddDiceSpeedReq) returns (proto.Empty);
+  rpc SetUserVIP(SetUserVIPReq) returns (proto.Empty);
+  rpc SetUserDiceMint(SetUserDiceMintReq) returns (proto.Empty);
+}
+
+message SetUserVIPReq {
+  string id = 1;
+  string hash =2;
+}
+message SetUserDiceMintReq {
+  string id = 1;
+  string hash =2;
+}
+
+message AddDiceSpeedReq {
+  string id = 1;
+  uint64 dice = 2;
+  string desc= 3;
 }
 
 message LoginTgReq {

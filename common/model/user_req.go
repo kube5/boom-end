@@ -1,5 +1,15 @@
 package model
 
+type BuyVipReq struct {
+	Hash string `json:"hash" form:"hash" binding:"required"`
+}
+
+func (req BuyVipReq) ErrMessages() map[string]string {
+	return map[string]string{
+		"Hash.required": "Hash is empty",
+	}
+}
+
 type GameRandomReq struct {
 	Level int `json:"level" form:"level" binding:"required"`
 }

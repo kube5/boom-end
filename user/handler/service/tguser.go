@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	invite_code "github.com/Mu-Exchange/Mu-End/common/utils/code"
 	"time"
 
 	"github.com/Mu-Exchange/Mu-End/common/dto"
@@ -31,6 +32,9 @@ type TgUserService interface {
 	RefreshToken(ctx context.Context, refreshUuid, accessUuid string, TgUserId string) (*model.TokenDetails, error)
 	Logout(ctx context.Context, givenUuid string, TgUserId string) error
 
+	AddDiceSpeed(ctx context.Context, TgUserId string, diceSpeed uint64, desc string) error
+	SetUserVIP(ctx context.Context, TgUserId, hash string) error
+	SetUserDiceMint(ctx context.Context, TgUserId, hash string) error
 	FindTgUserIdByWallet(ctx context.Context, wallet string) (string, error)
 }
 
@@ -47,6 +51,54 @@ type TgAccount struct {
 	ethClient   *ethclient.Client
 	gameService proto.GameService
 	lock        *redis.DistributedLock
+}
+
+func (a *TgAccount) SetUserVIP(ctx context.Context, TgUserId, hash string) error {
+	// todo make sure hash is valid
+	tgUser, err := a.QueryTgUser(ctx, TgUserId)
+	if err != nil {
+		return err
+	}
+	if tgUser == nil {
+		return derrors.ErrUserNotExist
+	}
+	if tgUser.Vip {
+		return nil
+	}
+	if err := a.AddDiceSpeed(ctx, TgUserId, 100, "VIP"); err != nil {
+		return err
+	}
+	tgUser.Vip = true
+	return a.UpdateTgUserByWallet(ctx, tgUser)
+}
+
+func (a *TgAccount) SetUserDiceMint(ctx context.Context, TgUserId, hash string) error {
+	// todo make sure hash is valid
+	tgUser, err := a.QueryTgUser(ctx, TgUserId)
+	if err != nil {
+		return err
+	}
+	if tgUser == nil {
+		return derrors.ErrUserNotExist
+	}
+	if tgUser.MintDice {
+		return nil
+	}
+	tgUser.MintDice = true
+	return a.UpdateTgUserByWallet(ctx, tgUser)
+}
+
+func (a *TgAccount) AddDiceSpeed(ctx context.Context, TgUserId string, diceSpeed uint64, desc string) error {
+	tgUser, err := a.QueryTgUser(ctx, TgUserId)
+	if err != nil {
+		return err
+	}
+	if tgUser == nil {
+		return derrors.ErrUserNotExist
+	}
+	tgUser.DiceSpeed += diceSpeed
+	a.Logger.Infof("AddDiceSpeed amount %d, desc %s, TgUser[%s] with address[%s]", diceSpeed, desc, tgUser.UUID, tgUser.Wallet)
+	return a.UpdateTgUserByWallet(ctx, tgUser)
 }
 
 func (a *TgAccount) QueryTgUser(ctx context.Context, TgUserId string) (*dto.TgUser, error) {
@@ -110,7 +162,7 @@ func NewTgUserService(lc fx.Lifecycle, sd fx.Shutdowner, cfg repo.CommonComponen
 }
 
 func (a *TgAccount) Start(sd fx.Shutdowner) error {
-	return nil
+	return a.TgUserCache.InitInviteCodeSeq()
 }
 
 func (a *TgAccount) Stop(sd fx.Shutdowner) error {
@@ -153,9 +205,15 @@ func (a *TgAccount) LoginByMetaMask(ctx context.Context, publicAddress, signatur
 		return nil, err
 	}
 	if TgUser == nil {
+		inviteCodeGeneration, err := a.InviteCodeGeneration(1)
+		if err != nil {
+			return nil, err
+		}
 		TgUser = &dto.TgUser{
-			UUID:   uuid.GenUUID().Encode(),
-			Wallet: publicAddress,
+			UUID:        uuid.GenUUID().Encode(),
+			Wallet:      publicAddress,
+			DiceSpeed:   50,
+			InvitedCode: inviteCodeGeneration[0],
 		}
 		if err := a.CreateTgUser(ctx, TgUser); err != nil {
 			return nil, err
@@ -185,9 +243,15 @@ func (a *TgAccount) LoginInternal(ctx context.Context, publicAddress string) (*m
 	//	return nil, derrors.ErrTgUserNotExist
 	//}
 	if TgUser == nil {
+		inviteCodeGeneration, err := a.InviteCodeGeneration(1)
+		if err != nil {
+			return nil, err
+		}
 		TgUser = &dto.TgUser{
-			UUID:   uuid.GenUUID().Encode(),
-			Wallet: publicAddress,
+			UUID:        uuid.GenUUID().Encode(),
+			Wallet:      publicAddress,
+			DiceSpeed:   50,
+			InvitedCode: inviteCodeGeneration[0],
 		}
 		if err := a.CreateTgUser(ctx, TgUser); err != nil {
 			return nil, err
@@ -276,10 +340,6 @@ func (a *TgAccount) CreateTgUser(ctx context.Context, TgUser *dto.TgUser) error 
 	if err := a.TgUserDao.Create(TgUser); err != nil {
 		return err
 	}
-	_, err := a.gameService.MissionCheckIn(ctx, &proto.UserIdReq{Id: TgUser.UUID})
-	if err != nil {
-		a.Logger.Errorf("MissionCheckIn err:%s", err.Error())
-	}
 	return nil
 }
 
@@ -292,4 +352,24 @@ func (a *TgAccount) FindTgUserIdByWallet(ctx context.Context, wallet string) (st
 		return "", derrors.ErrUserNotExist
 	}
 	return TgUser.UUID, nil
+}
+
+func (a *TgAccount) InviteCodeGeneration(amount int64) ([]string, error) {
+	if !a.lock.AcquireLock(InviteCodeLockKey, DistributionLockExpire) {
+		return nil, derrors.ErrUserPostTooFrequently
+	}
+	defer a.lock.ReleaseLock(InviteCodeLockKey)
+	inviteCodeSeq, err := a.TgUserCache.GetInviteCodeSeq()
+	if err != nil {
+		return nil, err
+	}
+	var result []string
+	for i := inviteCodeSeq; i < inviteCodeSeq+amount; i++ {
+		encode := invite_code.Encode(uint64(i))
+		result = append(result, encode)
+	}
+	if err := a.TgUserCache.SetInviteCodeSeq(inviteCodeSeq + amount); err != nil {
+		return nil, err
+	}
+	return result, nil
 }

@@ -80,13 +80,15 @@ type User struct {
 }
 
 type TgUser struct {
-	UUID       string `json:"uuid" gorm:"column:uuid;type:char(32);primaryKey;"`
-	Wallet     string `json:"wallet" gorm:"column:wallet;type:varchar(96);null;uniqueIndex"`
-	Tgname     string `json:"tgname" gorm:"column:tgname;type:varchar(100);null;index"`
-	TgId       string `json:"tg_id" gorm:"column:tg_id;type:varchar(100);null;index"`
-	ProfileUrl string `json:"profile_url" gorm:"column:profile_url;type:varchar(200);not null;"`
+	UUID        string `json:"uuid" gorm:"column:uuid;type:char(32);primaryKey;"`
+	Wallet      string `json:"wallet" gorm:"column:wallet;type:varchar(96);null;uniqueIndex"`
+	Tgname      string `json:"tgname" gorm:"column:tgname;type:varchar(100);null;index"`
+	TgId        string `json:"tg_id" gorm:"column:tg_id;type:varchar(100);null;index"`
+	ProfileUrl  string `json:"profile_url" gorm:"column:profile_url;type:varchar(200);not null;"`
+	InvitedCode string `json:"invited_code" gorm:"column:invited_code;type:varchar(10);not null;uniqueIndex;"`
 
 	MintDice  bool   `json:"is_add" gorm:"column:is_add;type:tinyint(1);not null"`
+	Vip       bool   `json:"vip" gorm:"column:vip;type:tinyint(1);not null"`
 	DiceSpeed uint64 `json:"dice_speed" gorm:"column:dice_speed;type:bigint;not null;"`
 
 	CreatedAt time.Time      `json:"created_at"`

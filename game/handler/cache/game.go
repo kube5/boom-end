@@ -52,10 +52,32 @@ type GameCache interface {
 
 	SetUserStake(wallet string) error
 	GetUserStake() ([]string, error)
+
+	TGTopIndexLB(pageNo, pageSize int64) (int64, []string, error)
+	TGSetLeaderBoardUser(userId string, score uint64) error
+	TGGetLeaderBoardUser(userId string) (uint64, error)
+	TGGetLeaderBoardUserScore(userId string) (int64, error)
+	GetTGUser() ([]string, error)
+
+	TGSetTotalScoreUsed24H(userId string, count int64) (uint64, error)
+	TGGetTotalScoreUsed24H(userId string) (uint64, error)
+	TGDelTotalScoreUsed24H() error
 }
 
 type Game struct {
 	*redis.Cache
+}
+
+func (u *Game) TGGetTotalScoreUsed24H(userId string) (uint64, error) {
+	return u.HGet(ctx, fmt.Sprintf("%s-TG-SCORE-USED-24H", ServicePrefix), userId).Uint64()
+}
+
+func (u *Game) TGSetTotalScoreUsed24H(userId string, count int64) (uint64, error) {
+	return u.HIncrBy(ctx, fmt.Sprintf("%s-TG-SCORE-USED-24H", ServicePrefix), userId, count).Uint64()
+}
+
+func (u *Game) TGDelTotalScoreUsed24H() error {
+	return u.Del(ctx, fmt.Sprintf("%s-TG-SCORE-USED-24H", ServicePrefix)).Err()
 }
 
 const ServicePrefix = "{SGAME}"
@@ -208,4 +230,62 @@ func (u *Game) SetUserStake(wallet string) error {
 
 func (u *Game) GetUserStake() ([]string, error) {
 	return u.ZRevRange(ctx, userStakes(), 0, -1).Result()
+}
+
+//  tg-----------------
+
+func tgUsers() string {
+	return fmt.Sprintf("{TGSUSER}-USER-TG")
+}
+func tgtopIndexLB() string {
+	return fmt.Sprintf("%s-TOP-TG-INDEX-LB", ServicePrefix)
+}
+func tgleaderBoardUserKey() string {
+	return fmt.Sprintf("%s-USER-TG-LB", ServicePrefix)
+}
+func (u *Game) GetTGUser() ([]string, error) {
+	return u.ZRevRange(ctx, tgUsers(), 0, -1).Result()
+}
+
+func (u *Game) TGTopIndexLB(pageNo, pageSize int64) (int64, []string, error) {
+	nums, err := u.ZCard(ctx, tgtopIndexLB()).Result()
+	if err != nil {
+		return 0, nil, err
+	}
+	start, end := (pageNo-1)*pageSize, pageSize*pageNo-1
+	if pageNo*pageSize > nums {
+		end = nums
+	}
+	res, err := u.ZRevRange(ctx, tgtopIndexLB(), start, end).Result()
+	return nums, res, err
+}
+
+func (u *Game) TGSetLeaderBoardUser(userId string, score uint64) error {
+	pipe := u.Pipeline()
+	pipe.ZAdd(ctx, tgtopIndexLB(), redis_client.Z{Member: userId, Score: float64(score)})
+	pipe.HSet(ctx, tgleaderBoardUserKey(), HIdKey(userId), score)
+	_, err := pipe.Exec(ctx)
+	return err
+}
+
+func (u *Game) TGGetLeaderBoardUser(userId string) (uint64, error) {
+	val, err := u.HGet(ctx, tgleaderBoardUserKey(), HIdKey(userId)).Uint64()
+	if err == redis_client.Nil {
+		return 0, nil
+	}
+	if err != nil {
+		return 0, err
+	}
+	return val, err
+}
+
+func (u *Game) TGGetLeaderBoardUserScore(userId string) (int64, error) {
+	val, err := u.ZRevRank(ctx, tgtopIndexLB(), userId).Uint64()
+	if err == redis_client.Nil {
+		return -1, nil
+	}
+	if err != nil {
+		return 0, err
+	}
+	return int64(val), err
 }

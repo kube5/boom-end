@@ -45,6 +45,9 @@ type GameService interface {
 	MissionProfile(ctx context.Context, in *UserIdReq, opts ...client.CallOption) (*MissionProfileResp, error)
 	ScoreList(ctx context.Context, in *ScoreListReq, opts ...client.CallOption) (*ScoreListResp, error)
 	ConsumeList(ctx context.Context, in *ConsumeListReq, opts ...client.CallOption) (*ConsumeListResp, error)
+	TGGameRandom(ctx context.Context, in *GameRandomReq, opts ...client.CallOption) (*GameRandomResp, error)
+	TGLeaderBoard(ctx context.Context, in *LeaderBoardReq, opts ...client.CallOption) (*LeaderBoardResp, error)
+	Game24H(ctx context.Context, in *Game24HReq, opts ...client.CallOption) (*Game24HResp, error)
 }
 
 type gameService struct {
@@ -149,6 +152,36 @@ func (c *gameService) ConsumeList(ctx context.Context, in *ConsumeListReq, opts 
 	return out, nil
 }
 
+func (c *gameService) TGGameRandom(ctx context.Context, in *GameRandomReq, opts ...client.CallOption) (*GameRandomResp, error) {
+	req := c.c.NewRequest(c.name, "Game.TGGameRandom", in)
+	out := new(GameRandomResp)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameService) TGLeaderBoard(ctx context.Context, in *LeaderBoardReq, opts ...client.CallOption) (*LeaderBoardResp, error) {
+	req := c.c.NewRequest(c.name, "Game.TGLeaderBoard", in)
+	out := new(LeaderBoardResp)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameService) Game24H(ctx context.Context, in *Game24HReq, opts ...client.CallOption) (*Game24HResp, error) {
+	req := c.c.NewRequest(c.name, "Game.Game24H", in)
+	out := new(Game24HResp)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Game service
 
 type GameHandler interface {
@@ -161,6 +194,9 @@ type GameHandler interface {
 	MissionProfile(context.Context, *UserIdReq, *MissionProfileResp) error
 	ScoreList(context.Context, *ScoreListReq, *ScoreListResp) error
 	ConsumeList(context.Context, *ConsumeListReq, *ConsumeListResp) error
+	TGGameRandom(context.Context, *GameRandomReq, *GameRandomResp) error
+	TGLeaderBoard(context.Context, *LeaderBoardReq, *LeaderBoardResp) error
+	Game24H(context.Context, *Game24HReq, *Game24HResp) error
 }
 
 func RegisterGameHandler(s server.Server, hdlr GameHandler, opts ...server.HandlerOption) error {
@@ -174,6 +210,9 @@ func RegisterGameHandler(s server.Server, hdlr GameHandler, opts ...server.Handl
 		MissionProfile(ctx context.Context, in *UserIdReq, out *MissionProfileResp) error
 		ScoreList(ctx context.Context, in *ScoreListReq, out *ScoreListResp) error
 		ConsumeList(ctx context.Context, in *ConsumeListReq, out *ConsumeListResp) error
+		TGGameRandom(ctx context.Context, in *GameRandomReq, out *GameRandomResp) error
+		TGLeaderBoard(ctx context.Context, in *LeaderBoardReq, out *LeaderBoardResp) error
+		Game24H(ctx context.Context, in *Game24HReq, out *Game24HResp) error
 	}
 	type Game struct {
 		game
@@ -220,4 +259,16 @@ func (h *gameHandler) ScoreList(ctx context.Context, in *ScoreListReq, out *Scor
 
 func (h *gameHandler) ConsumeList(ctx context.Context, in *ConsumeListReq, out *ConsumeListResp) error {
 	return h.GameHandler.ConsumeList(ctx, in, out)
+}
+
+func (h *gameHandler) TGGameRandom(ctx context.Context, in *GameRandomReq, out *GameRandomResp) error {
+	return h.GameHandler.TGGameRandom(ctx, in, out)
+}
+
+func (h *gameHandler) TGLeaderBoard(ctx context.Context, in *LeaderBoardReq, out *LeaderBoardResp) error {
+	return h.GameHandler.TGLeaderBoard(ctx, in, out)
+}
+
+func (h *gameHandler) Game24H(ctx context.Context, in *Game24HReq, out *Game24HResp) error {
+	return h.GameHandler.Game24H(ctx, in, out)
 }

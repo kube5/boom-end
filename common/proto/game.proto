@@ -14,8 +14,22 @@ service Game {
   rpc MissionProfile(UserIdReq) returns (MissionProfileResp);
   rpc ScoreList(ScoreListReq) returns (ScoreListResp);
   rpc ConsumeList(ConsumeListReq) returns (ConsumeListResp);
+  // --------------------tg
+
+  rpc TGGameRandom(GameRandomReq) returns (GameRandomResp);
+  rpc TGLeaderBoard(LeaderBoardReq) returns (LeaderBoardResp);
+  rpc Game24H(Game24HReq) returns (Game24HResp);
 }
 
+
+message Game24HReq {
+  string user_id = 1;
+}
+
+message Game24HResp {
+  string user_id = 1;
+  uint64 amount = 2;
+}
 
 message MissionInvitedReq {
   string father_user_id = 1;

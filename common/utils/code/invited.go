@@ -8,7 +8,7 @@ const (
 	BASE    = "1E8S2DZX9WYLTN6BQF7CP5IK3MJUAR4HV"
 	DECIMAL = 33
 	PAD     = "A"
-	LEN     = 6
+	LEN     = 4
 )
 
 func Encode(uid uint64) string {

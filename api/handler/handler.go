@@ -149,16 +149,19 @@ func (s *Server) init() error {
 		ug.POST("/tg_login", s.apiHandlerWrap(s.TGMetaMaskLogin))
 		ug.POST("/refresh_token", s.apiHandlerWrap(s.TGRefreshToken))
 		ug.POST("/logout", s.TGTokenAuthMiddleware(), s.apiHandlerWrap(s.TGLogout))
+		//ug.POST("/bind/code", s.TGTokenAuthMiddleware(), s.apiHandlerWrap(s.BindCode))
 
-		//mg := v.Group("/mission")
-		//mg.GET("/profile", s.TokenAuthMiddleware(), s.apiHandlerWrap(s.MissionProfile))
+		mg := v.Group("/mission")
+		mg.GET("/profile", s.TGTokenAuthMiddleware(), s.apiHandlerWrap(s.TGMissionProfile))
 
 		gg := t.Group("/game")
-		gg.POST("/action/random", s.TGTokenAuthMiddleware(), s.apiHandlerWrap(s.GameRandom))
+		gg.POST("/action/random", s.TGTokenAuthMiddleware(), s.apiHandlerWrap(s.TGGameRandom))
+		gg.POST("/action/buy/dice", s.TGTokenAuthMiddleware(), s.apiHandlerWrap(s.BuyDice))
+		gg.POST("/action/buy/vip", s.TGTokenAuthMiddleware(), s.apiHandlerWrap(s.BuyVip))
+		gg.GET("/24h", s.TGTokenAuthMiddleware(), s.apiHandlerWrap(s.Game24H))
 
 		lg := t.Group("/leaderboard")
-		lg.GET("/", s.apiHandlerWrap(s.LeaderBoard))
-
+		lg.GET("/", s.apiHandlerWrap(s.TGLeaderBoard))
 	}
 
 	i := s.router.Group("/api/internal")

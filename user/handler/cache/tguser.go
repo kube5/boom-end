@@ -26,6 +26,10 @@ type TgUserCache interface {
 	DeleteTgUserAuth(userId string) error
 	SetLoginTime(userId string) error
 	GetLoginTime(userId string) (int64, error)
+
+	SetInviteCodeSeq(seq int64) error
+	GetInviteCodeSeq() (int64, error)
+	InitInviteCodeSeq() error
 }
 
 type TgUser struct {
@@ -33,6 +37,19 @@ type TgUser struct {
 }
 
 const TGServicePrefix = "{TGSUSER}"
+
+func (u *TgUser) SetInviteCodeSeq(seq int64) error {
+	return u.Set(ctx, InviteCodeSeqKey, seq, 0).Err()
+}
+
+func (u *TgUser) InitInviteCodeSeq() error {
+	return u.SetNX(ctx, InviteCodeSeqKey, 0, 0).Err()
+}
+func (u *TgUser) GetInviteCodeSeq() (int64, error) {
+	return u.Get(ctx, InviteCodeSeqKey).Int64()
+}
+
+const InviteCodeSeqKey = TGServicePrefix + "InviteCodeSeq"
 
 func (u *TgUser) Start(sd fx.Shutdowner) error {
 	return nil
@@ -68,6 +85,9 @@ func tgauthKey(userId string, givenUuid string) string {
 
 func tgauthPrefixKey(userId string) string {
 	return fmt.Sprintf("{Authtg}Auth-%s*", userId)
+}
+func tgUsers() string {
+	return fmt.Sprintf("{TGSUSER}-USER-TG")
 }
 
 func (u *TgUser) CreateAuth(userid string, td *model.TokenDetails) error {
@@ -121,6 +141,9 @@ func (u *TgUser) SetTgUser(user *dto.TgUser) error {
 	}
 	data, err := json.Marshal(user)
 	if err != nil {
+		return err
+	}
+	if err := u.ZAdd(ctx, tgUsers(), redis_client.Z{Member: user.Wallet, Score: float64(0)}).Err(); err != nil {
 		return err
 	}
 	return u.HSet(ctx, usertgKey(), HIdtgKey(user.UUID), data).Err()

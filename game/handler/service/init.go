@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	base.RegisterComponents(NewBaseService, NewGameService, NewUserService, NewStakingService)
+	base.RegisterComponents(NewBaseService, NewGameService, NewTGGameService, NewUserService, NewStakingService)
 }
 
 func NewUserService(cfg repo.CommonComponents) pb.UserService {

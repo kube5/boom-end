@@ -52,6 +52,9 @@ type UserService interface {
 	LoginByTg(ctx context.Context, in *LoginTgReq, opts ...client.CallOption) (*LoginTgResp, error)
 	TgRefreshToken(ctx context.Context, in *RefreshTokenReq, opts ...client.CallOption) (*RefreshTokenResp, error)
 	TGLogout(ctx context.Context, in *LogoutReq, opts ...client.CallOption) (*Empty, error)
+	AddDiceSpeed(ctx context.Context, in *AddDiceSpeedReq, opts ...client.CallOption) (*Empty, error)
+	SetUserVIP(ctx context.Context, in *SetUserVIPReq, opts ...client.CallOption) (*Empty, error)
+	SetUserDiceMint(ctx context.Context, in *SetUserDiceMintReq, opts ...client.CallOption) (*Empty, error)
 }
 
 type userService struct {
@@ -206,6 +209,36 @@ func (c *userService) TGLogout(ctx context.Context, in *LogoutReq, opts ...clien
 	return out, nil
 }
 
+func (c *userService) AddDiceSpeed(ctx context.Context, in *AddDiceSpeedReq, opts ...client.CallOption) (*Empty, error) {
+	req := c.c.NewRequest(c.name, "User.AddDiceSpeed", in)
+	out := new(Empty)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) SetUserVIP(ctx context.Context, in *SetUserVIPReq, opts ...client.CallOption) (*Empty, error) {
+	req := c.c.NewRequest(c.name, "User.SetUserVIP", in)
+	out := new(Empty)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) SetUserDiceMint(ctx context.Context, in *SetUserDiceMintReq, opts ...client.CallOption) (*Empty, error) {
+	req := c.c.NewRequest(c.name, "User.SetUserDiceMint", in)
+	out := new(Empty)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for User service
 
 type UserHandler interface {
@@ -225,6 +258,9 @@ type UserHandler interface {
 	LoginByTg(context.Context, *LoginTgReq, *LoginTgResp) error
 	TgRefreshToken(context.Context, *RefreshTokenReq, *RefreshTokenResp) error
 	TGLogout(context.Context, *LogoutReq, *Empty) error
+	AddDiceSpeed(context.Context, *AddDiceSpeedReq, *Empty) error
+	SetUserVIP(context.Context, *SetUserVIPReq, *Empty) error
+	SetUserDiceMint(context.Context, *SetUserDiceMintReq, *Empty) error
 }
 
 func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
@@ -243,6 +279,9 @@ func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.Handl
 		LoginByTg(ctx context.Context, in *LoginTgReq, out *LoginTgResp) error
 		TgRefreshToken(ctx context.Context, in *RefreshTokenReq, out *RefreshTokenResp) error
 		TGLogout(ctx context.Context, in *LogoutReq, out *Empty) error
+		AddDiceSpeed(ctx context.Context, in *AddDiceSpeedReq, out *Empty) error
+		SetUserVIP(ctx context.Context, in *SetUserVIPReq, out *Empty) error
+		SetUserDiceMint(ctx context.Context, in *SetUserDiceMintReq, out *Empty) error
 	}
 	type User struct {
 		user
@@ -309,4 +348,16 @@ func (h *userHandler) TgRefreshToken(ctx context.Context, in *RefreshTokenReq, o
 
 func (h *userHandler) TGLogout(ctx context.Context, in *LogoutReq, out *Empty) error {
 	return h.UserHandler.TGLogout(ctx, in, out)
+}
+
+func (h *userHandler) AddDiceSpeed(ctx context.Context, in *AddDiceSpeedReq, out *Empty) error {
+	return h.UserHandler.AddDiceSpeed(ctx, in, out)
+}
+
+func (h *userHandler) SetUserVIP(ctx context.Context, in *SetUserVIPReq, out *Empty) error {
+	return h.UserHandler.SetUserVIP(ctx, in, out)
+}
+
+func (h *userHandler) SetUserDiceMint(ctx context.Context, in *SetUserDiceMintReq, out *Empty) error {
+	return h.UserHandler.SetUserDiceMint(ctx, in, out)
 }

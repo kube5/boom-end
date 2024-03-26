@@ -151,7 +151,7 @@ func (s *Server) init() error {
 		ug.POST("/logout", s.TGTokenAuthMiddleware(), s.apiHandlerWrap(s.TGLogout))
 		//ug.POST("/bind/code", s.TGTokenAuthMiddleware(), s.apiHandlerWrap(s.BindCode))
 
-		mg := v.Group("/mission")
+		mg := t.Group("/mission")
 		mg.GET("/profile", s.TGTokenAuthMiddleware(), s.apiHandlerWrap(s.TGMissionProfile))
 
 		gg := t.Group("/game")

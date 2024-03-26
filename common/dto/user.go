@@ -85,7 +85,7 @@ type TgUser struct {
 	Tgname      string `json:"tgname" gorm:"column:tgname;type:varchar(100);null;index"`
 	TgId        string `json:"tg_id" gorm:"column:tg_id;type:varchar(100);null;index"`
 	ProfileUrl  string `json:"profile_url" gorm:"column:profile_url;type:varchar(200);not null;"`
-	InvitedCode string `json:"invited_code" gorm:"column:invited_code;type:varchar(10);not null;uniqueIndex;"`
+	InvitedCode string `json:"invited_code" gorm:"column:invited_code;type:varchar(10);null;uniqueIndex;"`
 
 	MintDice  bool   `json:"is_add" gorm:"column:is_add;type:tinyint(1);not null"`
 	Vip       bool   `json:"vip" gorm:"column:vip;type:tinyint(1);not null"`
